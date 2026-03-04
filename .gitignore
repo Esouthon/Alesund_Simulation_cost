@@ -1,0 +1,11 @@
+# Ignorer les environnements virtuels Python
+venv/
+env/
+.env/
+.venv/
+
+#Ingnorer les fichiers de données bruts
+#data/raw/
+
+#Note book 
+test.ipynb
