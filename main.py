@@ -14,7 +14,6 @@ def main():
     df = dp.sort_ship_columns(dp.load_and_prepare_data())
     
     # 2. Création du réseau PyPSA
-    # Le troisième argument 'True' semble activer la batterie d'après ta logique
     print(f"[2/4] Création du réseau (Solaire : {cfg.SOLAR_CAPACITY_MW} MW, Batterie : Oui)...")
     network = pfo.create_pypsa_network(df, cfg.SOLAR_CAPACITY_MW, True)
     
