@@ -30,7 +30,7 @@ def create_pypsa_network(df: pd.DataFrame,PV_nominal_capacity: float, Battery: b
     network.add("Link", "link_shore_power",
                 bus0="bus_main",
                 bus1="bus_ship",
-                p_nom=1e6,      # Capacité "infinie"
+                p_nom=32,      # Capacité "infinie"
                 efficiency=cfg.EFFICIENCY_LINK_SHIP) # Rendement de 90% vers les navires
     
     network.add("Link", "link_solar_main",
