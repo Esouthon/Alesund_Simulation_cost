@@ -1,60 +1,60 @@
 # src/config.py
+# Configuration parameters for the Alesund port microgrid simulation.
 
-# Path to the data directory
-DATA_PATH = 'data/raw'
+# ─────────────────────────────────────────────────────────
+#  Paths
+# ─────────────────────────────────────────────────────────
+DATA_PATH = "data/raw"
 
-# Financial Rules 
+# ─────────────────────────────────────────────────────────
+#  Financial parameters
+# ─────────────────────────────────────────────────────────
+SHORE_POWER_TARIFF_EUR_MWH = 300    # Shore-power selling price charged to ships (€/MWh)
+GRID_TAX_EUR_MWH = 100              # Network tax applied on grid electricity purchases (€/MWh)
+DISCOUNT_RATE = 0.05                # Weighted average cost of capital
 
-SHORE_POWER_COST_PER_MW = 300 # €/MWh
-TAX_PRICE=100 #€/MWh
-MAXIMUM_ELEC_PRICE=200 #€
-DISCOUNT_RATE = 0.06
+# ─────────────────────────────────────────────────────────
+#  Solar PV
+# ─────────────────────────────────────────────────────────
+SOLAR_CAPACITY_MW = 10              # Default installed capacity (MW)
+EFFICIENCY_LINK_SOLAR = 0.9        # DC/AC + cabling efficiency
+SOLAR_CO2_EMISSION_G_MWH = 15_000  # Lifecycle CO₂ intensity (gCO₂/MWh)
+SOLAR_CAPEX_MW = 800_000           # Capital cost (€/MW)
+SOLAR_OPEX_FIXED_MW = 10_000       # Fixed O&M (€/MW/year)
+SOLAR_OPEX_VAR_MWH = 0.01          # Variable O&M (€/MWh)
+SOLAR_LIFETIME = 40                # Technical lifetime (years)
 
-# Grid Parameters
-    ## Storage/Battery
-STORAGE_y_or_n=False
-STORAGE_CAPACITY_MWH = 10 # MWh
-STORAGE_POWER_MW = 3 # MW
-STORAGE_EFFICIENCY_STORE = 0.9
-STORAGE_EFFICIENCY_DISPATCH = 0.85
-STORAGE_EFFICIENCY_DC_TO_AC = 0.9
-SOC_t_0 = 0.5 # State of Charge initial (50% de la capacité)
+# ─────────────────────────────────────────────────────────
+#  Battery energy storage
+# ─────────────────────────────────────────────────────────
+STORAGE_CAPACITY_MW = 10           # Default power rating (MW)
+STORAGE_EFFICIENCY_STORE = 0.9     # Charging efficiency
+STORAGE_EFFICIENCY_DISPATCH = 0.85 # Discharging efficiency
+BATTERY_CAPEX_MWH = 1_500_000     # Capital cost (€/MWh)
+BATTERY_OPEX_FIXED_MWH = 20_000   # Fixed O&M (€/MWh/year)
+BATTERY_OPEX_VAR_MWH = 4.0        # Cycling / degradation cost (€/MWh)
+BATTERY_LIFETIME = 15              # Technical lifetime (years)
 
-BATTERY_CAPEX_MWH = 300000 #€/MWh
-BATTERY_OPEX_FIXED_MWH = 6000  # €/MWh/an
-BATTERY_OPEX_VAR_MWH = 4.0       # €/MWh (Coût de cyclage/dégradation)
-BATTERY_LIFETIME = 15            # Années
-
-STORAGE_LCOS_EUR_MWH = 80 # €/MWh
-
-
-    ## Solar
-SOLAR_CAPACITY_MW = 10 #MW
-EFFICIENCY_LINK_SOLAR = 0.9
-SOLAR_CO2_EMISSION_g_MWH = 15e3  # gCO2 / MW
-SOLAR_CAPEX_MW= 600_000 # €/MW
-SOLAR_OPEX_FIXED_MW=0.01 # €/MW/an
-SOLAR_OPEX_VAR_MWH = 0.01 # €/MWh
-SOLAR_LIFETIME = 25 # Années
-
-    ## Ship
-EFFICIENCY_LINK_SHIP = 0.9
+# ─────────────────────────────────────────────────────────
+#  Shore-power quayside link
+# ─────────────────────────────────────────────────────────
+EFFICIENCY_LINK_SHIP = 0.9         # Quayside converter efficiency
 
 
-def calculate_annualised_cost(capex: float, fixed_opex: float, discount_rate: float, lifetime: int) -> float:
-    """
-    Calcule le coût annualisé (capital_cost) pour PyPSA.
-    """
-    # Facteur de recouvrement du capital (CRF)
+# ─────────────────────────────────────────────────────────
+#  Derived costs (computed once at import time)
+# ─────────────────────────────────────────────────────────
+def _annualised_cost(capex: float, fixed_opex: float,
+                     discount_rate: float, lifetime: int) -> float:
+    """Capital-recovery factor × CAPEX + fixed O&M (€ per unit per year)."""
     crf = discount_rate / (1 - (1 + discount_rate) ** -lifetime)
-    return (capex * crf) + fixed_opex
+    return capex * crf + fixed_opex
 
-SOLAR_ANNUALISED_COST = calculate_annualised_cost(
+
+SOLAR_ANNUALISED_COST = _annualised_cost(
     SOLAR_CAPEX_MW, SOLAR_OPEX_FIXED_MW, DISCOUNT_RATE, SOLAR_LIFETIME
 )
 
-BATTERY_ANNUALISED_COST = calculate_annualised_cost(
+BATTERY_ANNUALISED_COST = _annualised_cost(
     BATTERY_CAPEX_MWH, BATTERY_OPEX_FIXED_MWH, DISCOUNT_RATE, BATTERY_LIFETIME
 )
-
-

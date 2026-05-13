@@ -11,3 +11,6 @@ matplotlib>=3.8.0
 adjustText>=1.1.1
 
 nbformat>=4.2.0
+
+
+ipywidgets
