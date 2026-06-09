@@ -86,7 +86,7 @@ def create_pypsa_network(
                     efficiency_dispatch=cfg.STORAGE_EFFICIENCY_DISPATCH,
                     capital_cost=cfg.BATTERY_ANNUALISED_COST,
                     marginal_cost=cfg.BATTERY_OPEX_VAR_MWH,
-                    state_of_charge_initial=0,
+                    cyclic_state_of_charge=True, #state_of_charge_initial=0,
                     carrier="Battery")
 
     return network
@@ -158,6 +158,7 @@ def create_pypsa_network_extendable(
         network.add("StorageUnit", "battery",
                     bus="bus_battery",
                     p_nom_extendable=True,
+                    max_hours=cfg.BATTERY_MAX_HOURS,
                     efficiency_store=cfg.STORAGE_EFFICIENCY_STORE,
                     efficiency_dispatch=cfg.STORAGE_EFFICIENCY_DISPATCH,
                     capital_cost=cfg.BATTERY_ANNUALISED_COST,

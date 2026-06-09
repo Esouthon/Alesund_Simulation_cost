@@ -10,16 +10,16 @@ DATA_PATH = "data/raw"
 #  Financial parameters
 # ─────────────────────────────────────────────────────────
 SHORE_POWER_TARIFF_EUR_MWH = 300    # Shore-power selling price charged to ships (€/MWh)
-GRID_TAX_EUR_MWH = 100              # Network tax applied on grid electricity purchases (€/MWh)
+GRID_TAX_EUR_MWH = 80               # Network tax applied on grid electricity purchases (€/MWh)
 DISCOUNT_RATE = 0.05                # Weighted average cost of capital
 
 # ─────────────────────────────────────────────────────────
 #  Solar PV
 # ─────────────────────────────────────────────────────────
-SOLAR_CAPACITY_MW = 10              # Default installed capacity (MW)
+SOLAR_CAPACITY_MW = 10             # Default installed capacity (MW)
 EFFICIENCY_LINK_SOLAR = 0.9        # DC/AC + cabling efficiency
 SOLAR_CO2_EMISSION_G_MWH = 15_000  # Lifecycle CO₂ intensity (gCO₂/MWh)
-SOLAR_CAPEX_MW = 800_000           # Capital cost (€/MW)
+SOLAR_CAPEX_MW = 700_000           # Capital cost (€/MW)
 SOLAR_OPEX_FIXED_MW = 10_000       # Fixed O&M (€/MW/year)
 SOLAR_OPEX_VAR_MWH = 0.01          # Variable O&M (€/MWh)
 SOLAR_LIFETIME = 40                # Technical lifetime (years)
@@ -30,9 +30,10 @@ SOLAR_LIFETIME = 40                # Technical lifetime (years)
 STORAGE_CAPACITY_MW = 10           # Default power rating (MW)
 STORAGE_EFFICIENCY_STORE = 0.9     # Charging efficiency
 STORAGE_EFFICIENCY_DISPATCH = 0.85 # Discharging efficiency
-BATTERY_CAPEX_MWH = 1_500_000     # Capital cost (€/MWh)
-BATTERY_OPEX_FIXED_MWH = 20_000   # Fixed O&M (€/MWh/year)
-BATTERY_OPEX_VAR_MWH = 4.0        # Cycling / degradation cost (€/MWh)
+BATTERY_MAX_HOURS = 4              # Energy-to-power ratio (h): e_nom = p_nom × max_hours
+BATTERY_CAPEX_MWH = 200_000        # Capital cost (€/MWh)
+BATTERY_OPEX_FIXED_MWH = 20_000    # Fixed O&M (€/MWh/year)
+BATTERY_OPEX_VAR_MWH = 4.0         # Cycling / degradation cost (€/MWh)
 BATTERY_LIFETIME = 15              # Technical lifetime (years)
 
 # ─────────────────────────────────────────────────────────
@@ -55,6 +56,10 @@ SOLAR_ANNUALISED_COST = _annualised_cost(
     SOLAR_CAPEX_MW, SOLAR_OPEX_FIXED_MW, DISCOUNT_RATE, SOLAR_LIFETIME
 )
 
+# PyPSA StorageUnit.capital_cost is in €/MW (power capacity).
+# Convert €/MWh → €/MW by multiplying by the energy-to-power ratio.
 BATTERY_ANNUALISED_COST = _annualised_cost(
-    BATTERY_CAPEX_MWH, BATTERY_OPEX_FIXED_MWH, DISCOUNT_RATE, BATTERY_LIFETIME
+    BATTERY_CAPEX_MWH * BATTERY_MAX_HOURS,
+    BATTERY_OPEX_FIXED_MWH * BATTERY_MAX_HOURS,
+    DISCOUNT_RATE, BATTERY_LIFETIME
 )
